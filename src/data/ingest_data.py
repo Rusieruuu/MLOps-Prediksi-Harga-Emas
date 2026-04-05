@@ -7,7 +7,6 @@ from datetime import datetime
 RAW_DATA_DIR = 'data/raw/'
 os.makedirs(RAW_DATA_DIR, exist_ok=True)
 
-# Gunakan API Key Alpha Vantage Anda
 API_KEY = "45BR4FHJM2P78TSK" 
 SYMBOL = "GLD" # Ticker untuk Emas (ETF)
 
@@ -19,7 +18,7 @@ def fetch_gold_data():
     params = {
         "function": "TIME_SERIES_DAILY",
         "symbol": SYMBOL,
-        "outputsize": "compact", # Jatah gratis: memberikan 100 baris terbaru
+        "outputsize": "compact", 
         "apikey": API_KEY
     }
 
