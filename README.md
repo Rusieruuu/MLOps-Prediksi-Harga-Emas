@@ -14,7 +14,7 @@ Proyek ini diorganisasikan menggunakan konvensi standar industri untuk memastika
 
 ---
 
-## ⚙️ Implementasi Pipeline Data (LK-04)
+## ⚙️ Implementasi Pipeline Data
 Bagian ini mengelola alur data otomatis dari pengambilan hingga siap digunakan oleh model AI untuk mendukung konsep *Continual Learning*.
 
 ### 1. Ingest Data Mentah (`ingest_data.py`)
@@ -24,12 +24,12 @@ Skrip ini bertugas menarik data terbaru secara otomatis dari API Alpha Vantage.
 * **Non-Destruktif:** Nama file menggunakan *full timestamp* (`gold_raw_YYYYMMDD_HHMMSS.csv`) agar data historis tetap tersimpan dan tidak tertimpa.
 * **Eksekusi:** `python src/data/ingest_data.py`
 
-### 2. Automasi Prapemrosesan (`preprocess.py`)
+### 2. Automasi Prapemrosesan (`preprocessing.py`)
 Skrip ini mengolah seluruh file mentah menjadi dataset tunggal yang bersih dan terstandarisasi.
 * **Deduplikasi:** Mengeliminasi data dengan tanggal yang sama akibat pengambilan berulang.
 * **Sliding Window:** Membatasi dataset pada **1000 baris terbaru** untuk memastikan model hanya belajar dari tren pasar terkini.
 * **Versioning:** Menghasilkan file **Master** (`gold_master_processed.csv`) untuk pelatihan model dan file **Versi** unik ber-timestamp untuk kebutuhan audit eksperimen.
-* **Eksekusi:** `python src/data/preprocess.py`
+* **Eksekusi:** `python src/data/preprocessing.py`
 
 ---
 
