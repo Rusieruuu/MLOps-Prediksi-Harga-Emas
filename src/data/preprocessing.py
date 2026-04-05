@@ -9,7 +9,6 @@ from datetime import datetime
 RAW_DATA_DIR = 'data/raw/'
 PROCESSED_DATA_DIR = 'data/processed/'
 
-# Pastikan folder tujuan sudah ada
 os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
 
 def preprocess_and_versioning():
@@ -33,13 +32,11 @@ def preprocess_and_versioning():
     df_merged.sort_values('Date', inplace=True)
     
     # 4. Deduplikasi (Menghapus Tanggal yang Sama)
-    # Sangat penting karena pengambilan data 'compact' setiap hari pasti tumpang tindih
     baris_awal = len(df_merged)
     df_merged.drop_duplicates(subset='Date', keep='last', inplace=True)
     print(f"🧹 Membersihkan {baris_awal - len(df_merged)} baris data duplikat.")
     
     # 5. Implementasi Sliding Window (Maksimal 1000 Data Terbaru)
-    # Menjamin model hanya belajar dari tren harga emas terkini
     BATAS_DATA = 1000
     if len(df_merged) > BATAS_DATA:
         df_merged = df_merged.tail(BATAS_DATA)
