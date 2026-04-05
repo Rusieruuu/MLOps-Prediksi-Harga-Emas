@@ -1,7 +1,7 @@
 # MLOps-Prediksi-Harga-Emas
 
 ## Tujuan Proyek
-Proyek ini merupakan inisiasi pengembangan sistem *Artificial Intelligence* (AI) secara individu yang berorientasi pada tahap *production*. Tujuan utamanya adalah membangun sistem peramalan harga emas (XAU/USD) menggunakan prinsip-prinsip MLOps, termasuk implementasi *pipeline* untuk *continuous training* agar model dapat beradaptasi dengan pergerakan harga pasar secara dinamis.
+Proyek ini merupakan inisiasi pengembangan sistem *Artificial Intelligence* (AI) secara individu yang berorientasi pada tahap *production*. Tujuan utamanya adalah membangun sistem peramalan harga emas menggunakan prinsip-prinsip MLOps, termasuk implementasi *pipeline* untuk *continuous training* agar model dapat beradaptasi dengan pergerakan harga pasar secara dinamis.
 
 ## Struktur Direktori
 Proyek ini diorganisasikan menggunakan konvensi standar industri untuk memastikan kerapian dan skalabilitas:
