@@ -1,0 +1,5 @@
+outs:
+- md5: 0a37a965bedf168aebd2ca1ae56d6423
+  size: 4843
+  hash: md5
+  path: gold_data.csv

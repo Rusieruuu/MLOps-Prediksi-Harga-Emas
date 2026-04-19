@@ -1,0 +1,7 @@
+dvc
+requests
+yfinance
+pandas
+numpy
+scikit-learn
+python-dotenv
