@@ -33,6 +33,33 @@ Skrip ini mengolah seluruh file mentah menjadi dataset tunggal yang bersih dan t
 
 ---
 
+## 🛠️ Manajemen Versi Data (DVC) & Remote Storage
+Proyek ini memisahkan antara kode program (Git) dan dataset berukuran besar (DVC). Metadata dataset disimpan dalam file `.dvc`, sedangkan data asli disimpan di remote storage.
+
+### 1. Inisialisasi & Konfigurasi
+DVC diinisialisasi untuk mengelola siklus hidup data. Remote storage dikonfigurasi menggunakan DagsHub (HTTPS) sebagai tujuan default penyimpanan melalui perintah `dvc init` dan `dvc remote add`.
+
+### 2. Alur Pelacakan Data (Data Tracking)
+Setiap dataset baru yang masuk melalui folder `data/raw/` atau `data/processed/` akan didaftarkan ke DVC untuk dibuatkan "sidik jari" (MD5 hash) menggunakan perintah `dvc add`. Setelah itu, hanya file pointer `.dvc` dan `.gitignore` yang di-commit ke Git.
+
+### 3. Simulasi Continual Learning
+Saat terjadi penambahan atau perubahan data (misal: setelah menjalankan skrip ingest dan preprocessing terbaru), alur kerja yang dilakukan adalah:
+1. Lakukan tracking ulang pada dataset menggunakan `dvc add` untuk memperbarui metadata.
+2. Push data fisik yang baru ke DagsHub menggunakan `dvc push`.
+3. Commit perubahan file `.dvc` ke Git untuk mencatat versi metadata terbaru.
+
+### 4. Audit & Verifikasi Data
+Untuk memantau perbedaan antar versi data, digunakan perintah:
+* `dvc status`: Melihat file data yang berubah namun belum di-track.
+* `dvc diff`: Melihat perbedaan ukuran dan hash antara versi data lama dan baru.
+
+### 5. Integrasi Object Storage (DagsHub)
+Dataset pada proyek ini **tidak disimpan di GitHub**. Kami menggunakan **DagsHub** sebagai Object Storage eksternal. Hal ini memungkinkan kolaborasi data yang besar dengan efisien tanpa batasan limitasi file Git.
+* **Status Data**: DVC Managed
+* **Storage Lokasi**: https://dagshub.com/Rusieruuu/MLOps-Prediksi-Harga-Emas
+
+---
+
 ## Cara Menjalankan Lingkungan Kerja (GitHub Codespaces)
 Repositori ini telah dikonfigurasi untuk dijalankan secara instan menggunakan GitHub Codespaces dengan lingkungan Python yang sudah terisolasi dan konsisten.
 
