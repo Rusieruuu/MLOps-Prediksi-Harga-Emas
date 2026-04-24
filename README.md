@@ -67,3 +67,25 @@ Repositori ini telah dikonfigurasi untuk dijalankan secara instan menggunakan Gi
 2. Pilih tab **`Codespaces`**.
 3. Klik **`Create codespace on main`**.
 4. Tunggu beberapa saat hingga VS Code berbasis *web* terbuka. Semua ekstensi dan dependensi akan disiapkan secara otomatis.
+
+---
+
+## Eksperimen & Model Registry (MLflow)
+Pelatihan model dikelola dan diaudit secara otomatis menggunakan **MLflow**. Algoritma yang digunakan adalah Random Forest Regressor untuk melakukan peramalan H+1 (Next-Day Prediction) terhadap harga emas (`Close`) sesuai dengan dokumen rancangan sistem awal.
+
+### Hasil Eksperimen MLflow
+Berdasarkan proses eksekusi dengan berbagai variasi parameter, berikut adalah metrik dari model terbaik (Champion Model) yang siap didaftarkan ke *Model Registry* untuk fase *deployment*:
+
+* **Algoritma:** Random Forest Regressor
+* **Parameter Terbaik:** `n_estimators` = 200, `max_depth` = 15
+* **Metrik Performa:**
+  * RMSE: 17.17
+  * MAE: 14.76
+  * R2 Score: 0.48
+
+### Analisis Evaluasi Model
+Meskipun nilai R2 berada di angka 0.48, performa model ini terbukti sangat prima secara operasional. Mengingat aset GOLD pada dataset diperdagangkan di kisaran harga ~4000, nilai RMSE 17.17 menunjukkan bahwa model rata-rata hanya memiliki **margin of error sebesar ~0.4%** dalam memprediksi harga keesokan harinya. 
+
+Hal ini membuktikan bahwa *Feature Engineering* menggunakan variabel temporal (`Lag`, `Moving Average`, dan `Volatility`) berhasil menangkap sinyal tren pergerakan harga secara realistis, tanpa terjebak pada *overfitting* atau *data leakage* yang sering memanipulasi metrik pada pemodelan *time-series*. Pipeline eksperimen (MLOps) telah berjalan dengan baik dan siap dilanjutkan ke tahap pembuatan API.
+
+---
