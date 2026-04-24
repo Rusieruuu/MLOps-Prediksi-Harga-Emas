@@ -1,0 +1,23 @@
+artifact_path: /workspaces/MLOps-Prediksi-Harga-Emas/mlruns/1/models/m-9076dcd9bc2f4f02b737445e683fa2bf/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.3
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.11.1
+model_id: m-9076dcd9bc2f4f02b737445e683fa2bf
+model_size_bytes: 1350395
+model_uuid: m-9076dcd9bc2f4f02b737445e683fa2bf
+prompts: null
+run_id: 1997d098530a40f4be354a2458609e5a
+utc_time_created: '2026-04-24 15:15:56.841521'
