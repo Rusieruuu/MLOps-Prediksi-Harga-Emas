@@ -53,9 +53,6 @@ def train_model(n_estimators, max_depth):
     # Split Data (Time-series split, urutan waktu dijaga ketat)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
     
-    # Set Eksperimen MLflow
-    mlflow.set_experiment("Eksperimen_Prediksi_Emas")
-    
     with mlflow.start_run():
         rf = RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth, random_state=42)
         rf.fit(X_train, y_train)
@@ -81,4 +78,8 @@ if __name__ == "__main__":
     parser.add_argument("--max_depth", type=int, default=5)
     args = parser.parse_args()
     
+    mlflow.set_tracking_uri("sqlite:///mlruns.db") # TAMBAHKAN BARIS INI
+    mlflow.set_experiment("Eksperimen_Prediksi_Emas")
+
     train_model(args.n_estimators, args.max_depth)
+    
