@@ -89,3 +89,11 @@ Meskipun nilai R2 berada di angka 0.48, performa model ini terbukti sangat prima
 Hal ini membuktikan bahwa *Feature Engineering* menggunakan variabel temporal (`Lag`, `Moving Average`, dan `Volatility`) berhasil menangkap sinyal tren pergerakan harga secara realistis, tanpa terjebak pada *overfitting* atau *data leakage* yang sering memanipulasi metrik pada pemodelan *time-series*. Pipeline eksperimen (MLOps) telah berjalan dengan baik dan siap dilanjutkan ke tahap pembuatan API.
 
 ---
+
+## Model Registry & Inferensi
+Proses manajemen siklus hidup model ditangani menggunakan **MLflow Model Registry** dan disinkronisasikan menggunakan **DVC**. 
+
+* **Model Aktif (Production):** `Gold Prediction Model` (Version 2)
+* **Alasan Pemilihan V2:** Versi 2 dikonfigurasi menggunakan parameter `n_estimators=250` sebagai iterasi lanjutan dari *Champion Model* sebelumnya. Model ini telah melalui fase peralihan dari *None* -> *Staging* -> *Production*.
+* **Kesiapan Inferensi:** Model berstatus *Production* diakses secara dinamis menggunakan sintaks `models:/Gold Prediction Model/Production`, memastikan layanan inferensi tidak akan terganggu (Zero-Downtime) ketika ada *update* model baru di masa mendatang karena sistem akan selalu menarik *tag* Production.
+* **Lineage Data:** Metadata dari model Production diikat menggunakan DVC pada file `.dvc` untuk memastikan *reproducibility*.
