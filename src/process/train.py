@@ -72,13 +72,38 @@ def train_model(n_estimators, max_depth):
         mlflow.sklearn.log_model(rf, "model")
         print("✅ Eksperimen berhasil dicatat oleh MLflow!\n")
 
+        THRESHOLD_R2 = 0.40
+        
+        if r2 >= THRESHOLD_R2:
+            print(f"🌟 Evaluasi Sukses! R2 ({r2:.4f}) melebihi threshold ({THRESHOLD_R2}).")
+            print("Mendaftarkan model ke Model Registry dengan status Staging...")
+            
+            # Ambil ID run saat ini
+            run_id = mlflow.active_run().info.run_id
+            model_uri = f"runs:/{run_id}/model"
+            
+            # Daftarkan Model
+            nama_model = "Gold Prediction Model"
+            mv = mlflow.register_model(model_uri, nama_model)
+            
+            # Ubah status ke Staging menggunakan MLflow Client
+            client = mlflow.tracking.MlflowClient()
+            client.transition_model_version_stage(
+                name=nama_model,
+                version=mv.version,
+                stage="Staging"
+            )
+            print("✅ Model otomatis masuk ke Staging!")
+        else:
+            print(f"❌ Evaluasi Gagal. R2 ({r2:.4f}) di bawah threshold. Model ditolak.")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_estimators", type=int, default=100)
     parser.add_argument("--max_depth", type=int, default=5)
     args = parser.parse_args()
     
-    mlflow.set_tracking_uri("sqlite:///mlruns.db") # TAMBAHKAN BARIS INI
+    mlflow.set_tracking_uri("sqlite:///mlruns.db")
     mlflow.set_experiment("Eksperimen_Prediksi_Emas")
 
     train_model(args.n_estimators, args.max_depth)
