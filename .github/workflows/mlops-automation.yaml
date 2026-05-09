@@ -31,7 +31,7 @@ jobs:
         dvc remote modify origin --local auth basic
         dvc remote modify origin --local user Rusieruuu
         dvc remote modify origin --local password $DAGSHUB_TOKEN
-        dvc pull -r origin
+        dvc pull data/processed/gold_processed.csv.dvc -r origin
 
     - name: 4. Tahap 1 - Automated Testing (Pytest)
       run: |
