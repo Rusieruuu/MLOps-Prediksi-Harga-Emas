@@ -6,8 +6,9 @@ def test_data_exists():
     assert os.path.exists("data/processed/gold_processed.csv"), "File data tidak ditemukan!"
 
 def test_kolom_wajib_ada():
-    """Memastikan hasil feature engineering tidak merusak struktur kolom"""
+    """Memastikan struktur kolom data dasar sudah benar sebelum masuk ke train.py"""
     df = pd.read_csv("data/processed/gold_processed.csv")
-    kolom_wajib = ['Open', 'High', 'Low', 'Close', 'Lag_1', 'MA_7', 'Volatility']
+    kolom_wajib = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
+    
     for kolom in kolom_wajib:
         assert kolom in df.columns, f"Kolom {kolom} hilang dari dataset!"
