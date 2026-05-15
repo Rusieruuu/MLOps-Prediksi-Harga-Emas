@@ -97,3 +97,24 @@ Proses manajemen siklus hidup model ditangani menggunakan **MLflow Model Registr
 * **Alasan Pemilihan V2:** Versi 2 dikonfigurasi menggunakan parameter `n_estimators=250` sebagai iterasi lanjutan dari *Champion Model* sebelumnya. Model ini telah melalui fase peralihan dari *None* -> *Staging* -> *Production*.
 * **Kesiapan Inferensi:** Model berstatus *Production* diakses secara dinamis menggunakan sintaks `models:/Gold Prediction Model/Production`, memastikan layanan inferensi tidak akan terganggu (Zero-Downtime) ketika ada *update* model baru di masa mendatang karena sistem akan selalu menarik *tag* Production.
 * **Lineage Data:** Metadata dari model Production diikat menggunakan DVC pada file `.dvc` untuk memastikan *reproducibility*.
+
+---
+
+## Cara Menjalankan Sistem Terorkestrasi (Docker Compose)
+
+Proyek ini telah dikonfigurasi menggunakan Docker Compose untuk menjalankan API Inferensi dan MLflow Tracking Server secara bersamaan dalam satu jaringan yang terisolasi.
+
+**Langkah Eksekusi:**
+1. Pastikan Docker sudah terinstal di environment Anda.
+2. Jalankan perintah berikut di terminal (pada direktori utama proyek):
+   ```bash
+   docker compose up -d --build
+   ```
+3. Akses layanan yang berjalan:
+   - **API Prediksi:** `http://localhost:8000`
+   - **MLflow UI:** `http://localhost:5000`
+
+Untuk mematikan seluruh layanan dan membersihkan jaringan, gunakan perintah:
+```bash
+docker compose down
+```
