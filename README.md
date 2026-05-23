@@ -118,3 +118,13 @@ Untuk mematikan seluruh layanan dan membersihkan jaringan, gunakan perintah:
 ```bash
 docker compose down
 ```
+---
+## LK-10: Model Serving & Horizontal Scaling
+
+### Langkah yang Dilakukan
+1. Training model dan mendaftarkan ke MLflow Registry dengan status Production
+2. Menjalankan `mlflow models serve` untuk serving model sebagai REST API lokal
+3. Melakukan uji coba endpoint menggunakan `curl` dan mendapat prediksi harga emas
+4. Modifikasi `docker-compose.yaml` dengan konfigurasi `deploy: replicas: 3`
+5. Verifikasi 3 replika api-service berjalan bersamaan menggunakan `docker compose ps`
+---
