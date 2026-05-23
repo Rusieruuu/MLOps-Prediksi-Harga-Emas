@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mlflow-server:
     image: python:3.10
@@ -18,15 +16,16 @@ services:
 
   api-service:
     build: .
-    container_name: api-service
     ports:
-      - "8000:8000"
+      - "8000-8002:8000"
     environment:
-      - MLFLOW_TRACKING_URI=http://mlflow-server:5000 
+      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
     depends_on:
       - mlflow-server
     networks:
       - mlops_network
+    deploy:
+      replicas: 3
 
 networks:
   mlops_network:
