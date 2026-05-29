@@ -19,7 +19,10 @@ services:
     ports:
       - "8000-8002:8000"
     environment:
-      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+      - MLFLOW_TRACKING_URI=sqlite:///mlruns.db
+    volumes:
+      - ./mlruns.db:/app/mlruns.db
+      - ./mlruns:/app/mlruns
     depends_on:
       - mlflow-server
     networks:
@@ -27,9 +30,36 @@ services:
     deploy:
       replicas: 3
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - mlops_network
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - mlops_network
+
 networks:
   mlops_network:
     driver: bridge
 
 volumes:
   mlflow_data:
+  grafana_data:
