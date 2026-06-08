@@ -1,0 +1,82 @@
+name: Continuous Training Pipeline
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Setiap Minggu jam 00:00 UTC (Skenario C)
+  workflow_dispatch:      # Bisa trigger manual
+    inputs:
+      reason:
+        description: 'Alasan trigger CT (drift/performance/manual)'
+        required: false
+        default: 'manual'
+
+jobs:
+  check-drift:
+    name: "Skenario B - Cek Data Drift"
+    runs-on: ubuntu-latest
+    outputs:
+      drift_detected: ${{ steps.drift.outputs.drift_detected }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install dvc
+      - name: Pull Data dari DagsHub
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user Rusieruuu
+          dvc remote modify origin --local password $DAGSHUB_TOKEN
+          dvc pull data/processed/gold_processed.csv.dvc -r origin
+      - name: Cek Data Drift
+        id: drift
+        run: |
+          python src/monitoring/check_drift.py && \
+            echo "drift_detected=false" >> $GITHUB_OUTPUT || \
+            echo "drift_detected=true" >> $GITHUB_OUTPUT
+
+  retrain:
+    name: "Retraining & Evaluasi Komparatif"
+    runs-on: ubuntu-latest
+    needs: check-drift
+    if: |
+      needs.check-drift.outputs.drift_detected == 'true' ||
+      github.event.inputs.reason != '' ||
+      github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install dvc pytest
+      - name: Pull Data dari DagsHub
+        env:
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        run: |
+          dvc remote modify origin --local auth basic
+          dvc remote modify origin --local user Rusieruuu
+          dvc remote modify origin --local password $DAGSHUB_TOKEN
+          dvc pull data/processed/gold_processed.csv.dvc -r origin
+      - name: Run Tests
+        run: pytest tests/
+      - name: Retrain Model
+        run: |
+          python src/process/train.py --n_estimators 200 --max_depth 15
+      - name: Evaluasi & Promosi Otomatis
+        run: |
+          python src/process/evaluate_and_promote.py
+      - name: Commit hasil ke repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add mlruns.db mlruns/ || true
+          git commit -m "CT: Auto-retrain $(date +'%Y-%m-%d') - trigger: ${{ github.event.inputs.reason || github.event_name }}" || echo "Tidak ada perubahan"
+          git push || echo "Push gagal (mungkin tidak ada perubahan)"
