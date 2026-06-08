@@ -118,7 +118,9 @@ Untuk mematikan seluruh layanan dan membersihkan jaringan, gunakan perintah:
 ```bash
 docker compose down
 ```
+
 ---
+
 ## LK-10: Model Serving & Horizontal Scaling
 
 ### Langkah yang Dilakukan
@@ -127,4 +129,76 @@ docker compose down
 3. Melakukan uji coba endpoint menggunakan `curl` dan mendapat prediksi harga emas
 4. Modifikasi `docker-compose.yaml` dengan konfigurasi `deploy: replicas: 3`
 5. Verifikasi 3 replika api-service berjalan bersamaan menggunakan `docker compose ps`
+
 ---
+
+## LK-11: Observability & Dashboard Monitoring
+
+### Komponen yang Ditambahkan
+- **Prometheus** (port 9090): Scraping metrik dari 3 replika api-service setiap 15 detik
+- **Grafana** (port 3000): Dashboard visualisasi 4 panel metrik operasional
+
+### Cara Menjalankan Monitoring
+Jalankan semua layanan dengan perintah berikut:
+
+    docker compose up -d
+
+Akses Grafana di http://localhost:3000 dengan username dan password admin.
+
+### Panel Dashboard Grafana
+- **Total Request API** - Memantau jumlah request masuk per replika menggunakan metrik api_request_total
+- **Latensi Inferensi** - Mengukur waktu respons API menggunakan metrik api_request_latency_seconds_sum
+- **CPU Usage** - Memantau beban CPU tiap container menggunakan metrik system_cpu_usage_percent
+- **Nilai Prediksi** - Memantau nilai prediksi harga emas untuk deteksi data drift menggunakan metrik model_prediction_value
+
+### Simulasi Traffic
+Untuk menghasilkan data pada dashboard, jalankan:
+
+    python simulate_traffic.py
+
+---
+
+## LK-12: Continuous Training (CT) Pipeline
+
+### Skenario Trigger Retraining Otomatis
+
+**Skenario A - Performance Based**
+Retraining dipicu jika R² model turun di bawah threshold 0.4. Ditangani oleh src/process/evaluate_and_promote.py.
+
+**Skenario B - Data Drift Based**
+Retraining dipicu jika perubahan distribusi fitur melebihi threshold berikut:
+- Open, High, Low, Close: threshold 20% karena harga emas relatif stabil
+- Volume: threshold 50% karena volume perdagangan sangat volatile
+
+Ditangani oleh src/monitoring/check_drift.py yang berjalan otomatis di setiap eksekusi pipeline.
+
+**Skenario C - Schedule Based**
+Retraining dijadwalkan setiap hari Minggu pukul 00:00 UTC melalui konfigurasi cron di GitHub Actions.
+
+### File CT Pipeline
+- .github/workflows/continuous-training.yml — Workflow GitHub Actions untuk CT
+- src/monitoring/check_drift.py — Deteksi data drift otomatis
+- src/process/evaluate_and_promote.py — Komparasi performa dan promosi model otomatis
+- simulate_drift.py — Simulasi data bergeser untuk keperluan testing
+
+### Cara Trigger CT Pipeline Manual
+1. Buka tab Actions di repositori GitHub
+2. Pilih Continuous Training Pipeline di sidebar kiri
+3. Klik Run workflow
+4. Isi kolom reason sesuai kebutuhan (drift/performance/manual)
+5. Klik Run workflow
+
+### Cara Simulasi Data Drift
+Jalankan perintah berikut secara berurutan:
+
+    python simulate_drift.py
+    python src/monitoring/check_drift.py
+    cp data/processed/gold_processed_backup.csv data/processed/gold_processed.csv
+
+### Alur CT Pipeline
+Setiap kali pipeline berjalan, sistem akan melakukan langkah berikut:
+1. Cek data drift menggunakan check_drift.py
+2. Jika drift terdeteksi atau trigger manual, jalankan retrain menggunakan train.py
+3. Evaluasi model baru vs model lama menggunakan evaluate_and_promote.py
+4. Jika R² model baru lebih tinggi dan di atas threshold 0.4, model otomatis dipromosikan ke Production
+5. Jika model baru tidak lebih baik, model Production lama tetap dipertahankan
